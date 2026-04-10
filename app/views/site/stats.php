@@ -61,34 +61,29 @@ $this->params['breadcrumbs'][] = $this->title;
                     [
                         'attribute' => 'short_code',
                         'label' => 'Short code',
-                        'value' => static fn (array $row): string => (string) $row['short_code'],
                     ],
                     [
                         'attribute' => 'ip',
                         'label' => 'IP',
-                        'value' => static fn (array $row): string => (string) $row['ip'],
                     ],
                     [
                         'attribute' => 'ip_clicks',
                         'label' => 'Переходов с IP',
-                        'value' => static fn (array $row): int => (int) $row['ip_clicks'],
                     ],
                     [
                         'attribute' => 'total_clicks',
                         'label' => 'Всего переходов по ссылке',
-                        'value' => static fn (array $row): int => (int) $row['total_clicks'],
                     ],
                     [
                         'attribute' => 'last_click_at',
                         'label' => 'Последний переход',
-                        'value' => static fn (array $row): string => (string) $row['last_click_at'],
                     ],
                     [
                         'label' => 'Ссылка',
                         'format' => 'raw',
-                        'value' => static fn (array $row): string => Html::a(
-                            Html::encode((string) $row['original_url']),
-                            (string) $row['original_url'],
+                        'value' => static fn ($row): string => Html::a(
+                            Html::encode((string) ($row->original_url ?? $row['original_url'] ?? '')),
+                            (string) ($row->original_url ?? $row['original_url'] ?? '#'),
                             ['target' => '_blank', 'rel' => 'noopener noreferrer']
                         ),
                     ],
