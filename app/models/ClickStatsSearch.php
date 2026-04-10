@@ -71,7 +71,7 @@ class ClickStatsSearch extends Model
             ],
         ]);
 
-        $this->load($params, '');
+        $this->load($params);
         if (!$this->validate()) {
             $query->andWhere('1=0');
             return $dataProvider;
