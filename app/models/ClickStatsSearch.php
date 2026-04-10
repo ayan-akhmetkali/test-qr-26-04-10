@@ -10,7 +10,8 @@ class ClickStatsSearch extends Model
 {
     public string $short_code = '';
     public string $ip = '';
-    public ?int $min_ip_clicks = null;
+    /** @var int|null */
+    public $min_ip_clicks = null;
 
     public function rules(): array
     {
@@ -19,6 +20,7 @@ class ClickStatsSearch extends Model
             [['short_code'], 'string', 'max' => 16],
             [['short_code'], 'match', 'pattern' => '/^[A-Za-z0-9_-]*$/'],
             [['ip'], 'string', 'max' => 45],
+            [['min_ip_clicks'], 'filter', 'filter' => static fn ($value) => $value === '' ? null : $value],
             [['min_ip_clicks'], 'integer', 'min' => 1],
         ];
     }
