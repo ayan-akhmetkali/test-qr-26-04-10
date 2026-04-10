@@ -217,8 +217,11 @@ FK:
 
 1. Инициализация Yii2 Basic, конфиги окружений.
 2. Миграции `links`, `link_click_logs`.
-3. AR-модели + rules.
-4. Сервисы (`ShortLinkService`, `RedirectService`).
+3. AR-модели + rules (фокус на DRY/SOLID/KISS):
+   - `Link` и `LinkClickLog` как тонкий слой доступа к данным (single responsibility);
+   - правила валидации и связи описаны в AR, без дублирования в контроллерах;
+   - переиспользование встроенных валидаторов Yii2 (`url`, `ip`, `exist`, `unique`) вместо самодельных проверок.
+4. Сервисы (`ShortLinkService`, `RedirectService`) для orchestration, чтобы AR не превращались в «бог-объекты».
 5. Контроллеры `SiteController` (форма) и `RedirectController`.
 6. Ajax-frontend на jQuery + Bootstrap view.
 7. Генерация QR локальной библиотекой.
