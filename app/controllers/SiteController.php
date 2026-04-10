@@ -2,6 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\ShortLinkForm;
+use app\services\Exception\LinkCreationException;
+use app\services\ShortLinkService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -12,6 +15,15 @@ use app\models\ContactForm;
 
 class SiteController extends Controller
 {
+    public function __construct(
+        $id,
+        $module,
+        private ShortLinkService $shortLinkService,
+        array $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -33,6 +45,7 @@ class SiteController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'logout' => ['post'],
+                    'create-link' => ['post'],
                 ],
             ],
         ];
@@ -61,7 +74,48 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        return $this->render('index', [
+            'model' => new ShortLinkForm(),
+        ]);
+    }
+
+    public function actionCreateLink(): array
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $model = new ShortLinkForm();
+        $model->load(Yii::$app->request->post(), '');
+
+        if (!$model->validate()) {
+            return [
+                'success' => false,
+                'message' => 'Некорректный URL.',
+                'errors' => $model->getErrors(),
+            ];
+        }
+
+        try {
+            $result = $this->shortLinkService->create($model->url);
+        } catch (LinkCreationException $exception) {
+            return [
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ];
+        } catch (\Throwable $exception) {
+            Yii::error($exception, __METHOD__);
+
+            return [
+                'success' => false,
+                'message' => 'Не удалось создать короткую ссылку.',
+            ];
+        }
+
+        return [
+            'success' => true,
+            'short_url' => $result->shortUrl,
+            'qr_url' => $result->qrUrl,
+            'short_code' => $result->shortCode,
+        ];
     }
 
     /**

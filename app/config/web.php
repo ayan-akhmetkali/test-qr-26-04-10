@@ -11,6 +11,11 @@ $config = [
         'singletons' => [
             \app\services\Contracts\ShortCodeGeneratorInterface::class => \app\components\SecureShortCodeGenerator::class,
             \app\services\Contracts\UrlAvailabilityCheckerInterface::class => \app\components\UrlAvailabilityChecker::class,
+            \app\services\ShortLinkService::class => static fn () => new \app\services\ShortLinkService(
+                shortCodeGenerator: \Yii::createObject(\app\services\Contracts\ShortCodeGeneratorInterface::class),
+                urlAvailabilityChecker: \Yii::createObject(\app\services\Contracts\UrlAvailabilityCheckerInterface::class),
+                shortUrlPrefix: '/r/'
+            ),
         ],
     ],
     'aliases' => [
@@ -48,14 +53,14 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'POST link/create' => 'site/create-link',
+                'r/<code:[A-Za-z0-9_-]{4,16}>' => 'redirect/go',
             ],
         ],
-        */
     ],
     'params' => $params,
 ];
