@@ -7,6 +7,12 @@ $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'container' => [
+        'singletons' => [
+            \app\services\Contracts\ShortCodeGeneratorInterface::class => \app\components\SecureShortCodeGenerator::class,
+            \app\services\Contracts\UrlAvailabilityCheckerInterface::class => \app\components\UrlAvailabilityChecker::class,
+        ],
+    ],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
