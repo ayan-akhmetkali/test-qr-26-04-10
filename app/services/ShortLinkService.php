@@ -7,10 +7,8 @@ use app\services\Contracts\ShortCodeGeneratorInterface;
 use app\services\Contracts\UrlAvailabilityCheckerInterface;
 use app\services\Dto\ShortLinkResult;
 use app\services\Exception\LinkCreationException;
-use Da\QrCode\Lib\Enum;
 use Da\QrCode\QrCode;
 use Yii;
-use yii\base\InvalidConfigException;
 
 class ShortLinkService
 {
@@ -20,9 +18,7 @@ class ShortLinkService
     public function __construct(
         private ShortCodeGeneratorInterface $shortCodeGenerator,
         private UrlAvailabilityCheckerInterface $urlAvailabilityChecker,
-        private string $shortUrlPrefix = '/r/',
-        private string $qrDirectoryAlias = '@webroot/uploads/qr',
-        private string $qrPublicPrefix = '/uploads/qr'
+        private string $shortUrlPrefix = '/r/'
     ) {
     }
 
@@ -42,7 +38,7 @@ class ShortLinkService
         }
 
         $shortUrl = rtrim(Yii::$app->request->hostInfo, '/') . $this->shortUrlPrefix . $link->short_code;
-        $qrUrl = $this->generateQr($shortUrl, $link->short_code);
+        $qrUrl = $this->generateQr($shortUrl);
 
         return new ShortLinkResult(
             shortCode: $link->short_code,
@@ -65,24 +61,12 @@ class ShortLinkService
         throw new LinkCreationException('Не удалось сгенерировать уникальный short code.');
     }
 
-    private function generateQr(string $payload, string $shortCode): string
+    private function generateQr(string $payload): string
     {
-        $directory = Yii::getAlias($this->qrDirectoryAlias);
-        if (!is_dir($directory) && !mkdir($directory, 0775, true) && !is_dir($directory)) {
-            throw new InvalidConfigException('Не удалось создать директорию для QR-кодов.');
-        }
-
-        $filename = $shortCode . '.png';
-        $path = $directory . DIRECTORY_SEPARATOR . $filename;
-
-        QrCode::png(
-            text: $payload,
-            outfile: $path,
-            level: Enum::QR_ECLEVEL_M,
-            size: self::QR_SIZE,
-            margin: 2
-        );
-
-        return rtrim($this->qrPublicPrefix, '/') . '/' . $filename;
+        $qrCode = new QrCode($payload);
+        return $qrCode
+            ->setSize(self::QR_SIZE)
+            ->setMargin(2)
+            ->writeDataUri();
     }
 }
