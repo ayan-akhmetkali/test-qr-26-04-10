@@ -38,7 +38,7 @@ services:
       MYSQL_PASSWORD: qr_password
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - '3307:3306'
+      - '3390:3306'
     volumes:
       - mysql_test_ayan_data:/var/lib/mysql
     healthcheck:
