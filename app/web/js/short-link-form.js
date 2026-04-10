@@ -58,7 +58,7 @@
 
         $form.on('beforeSubmit', function () {
             submit();
-            return;
+            return false;
         });
 
         $copyButton.on('click', function () {
