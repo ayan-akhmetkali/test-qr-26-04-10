@@ -87,27 +87,17 @@ class SiteController extends Controller
         $model->load(Yii::$app->request->post(), '');
 
         if (!$model->validate()) {
-            return [
-                'success' => false,
-                'message' => 'Некорректный URL.',
-                'errors' => $model->getErrors(),
-            ];
+            return $this->errorResponse('Некорректный URL.', $model->getErrors());
         }
 
         try {
             $result = $this->shortLinkService->create($model->url);
         } catch (LinkCreationException $exception) {
-            return [
-                'success' => false,
-                'message' => $exception->getMessage(),
-            ];
+            return $this->errorResponse($exception->getMessage());
         } catch (\Throwable $exception) {
             Yii::error($exception, __METHOD__);
 
-            return [
-                'success' => false,
-                'message' => 'Не удалось создать короткую ссылку.',
-            ];
+            return $this->errorResponse('Не удалось создать короткую ссылку.');
         }
 
         return [
@@ -115,6 +105,15 @@ class SiteController extends Controller
             'short_url' => $result->shortUrl,
             'qr_url' => $result->qrUrl,
             'short_code' => $result->shortCode,
+        ];
+    }
+
+    private function errorResponse(string $message, array $errors = []): array
+    {
+        return [
+            'success' => false,
+            'message' => $message,
+            'errors' => $errors,
         ];
     }
 

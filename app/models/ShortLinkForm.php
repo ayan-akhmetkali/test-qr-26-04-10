@@ -11,8 +11,8 @@ class ShortLinkForm extends Model
     public function rules(): array
     {
         return [
-            [['url'], 'required'],
             [['url'], 'trim'],
+            [['url'], 'required'],
             [['url'], 'string', 'max' => 2048],
             [['url'], 'url', 'validSchemes' => ['http', 'https']],
         ];
