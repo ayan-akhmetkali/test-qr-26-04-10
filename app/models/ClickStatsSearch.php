@@ -42,6 +42,7 @@ class ClickStatsSearch extends Model
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'key' => 'link_id',
             'pagination' => ['pageSize' => 20],
             'sort' => [
                 'defaultOrder' => ['ip_clicks' => SORT_DESC, 'last_click_at' => SORT_DESC],
