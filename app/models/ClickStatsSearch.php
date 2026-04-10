@@ -54,16 +54,16 @@ class ClickStatsSearch extends Model
                         'desc' => ['log.ip' => SORT_DESC],
                     ],
                     'ip_clicks' => [
-                        'asc' => [new Expression('COUNT(*)') => SORT_ASC],
-                        'desc' => [new Expression('COUNT(*)') => SORT_DESC],
+                        'asc' => ['ip_clicks' => SORT_ASC],
+                        'desc' => ['ip_clicks' => SORT_DESC],
                     ],
                     'total_clicks' => [
                         'asc' => ['link.click_count' => SORT_ASC],
                         'desc' => ['link.click_count' => SORT_DESC],
                     ],
                     'last_click_at' => [
-                        'asc' => [new Expression('MAX(log.created_at)') => SORT_ASC],
-                        'desc' => [new Expression('MAX(log.created_at)') => SORT_DESC],
+                        'asc' => ['last_click_at' => SORT_ASC],
+                        'desc' => ['last_click_at' => SORT_DESC],
                     ],
                 ],
             ],
