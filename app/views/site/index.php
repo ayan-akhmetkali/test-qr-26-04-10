@@ -2,6 +2,7 @@
 
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
+use yii\widgets\MaskedInput;
 
 /** @var yii\web\View $this */
 /** @var app\models\ShortLinkForm $model */
@@ -27,9 +28,14 @@ $this->registerJsFile('@web/js/short-link-form.js', ['depends' => [\yii\web\Jque
                             'data-short-link-form' => '1',
                         ],
                     ]); ?>
-                        <?= $form->field($model, 'url')->textInput([
-                            'placeholder' => 'https://example.com/page',
-                            'autocomplete' => 'off',
+                        <?= $form->field($model, 'url')->widget(MaskedInput::class, [
+                            'options' => [
+                                'placeholder' => 'https://example.com/page',
+                                'autocomplete' => 'off',
+                            ],
+                            'clientOptions' => [
+                                'alias' => 'url',
+                            ],
                         ]) ?>
 
                         <div class="d-grid d-sm-flex gap-2">
