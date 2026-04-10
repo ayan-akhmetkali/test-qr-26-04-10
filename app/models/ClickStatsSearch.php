@@ -27,6 +27,7 @@ class ClickStatsSearch extends Model
     {
         $query = LinkClickLog::find()
             ->alias('log')
+            ->asArray()
             ->select([
                 'link.id AS link_id',
                 'link.short_code',
