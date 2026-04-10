@@ -32,6 +32,28 @@
             $errorBox.text(message).removeClass('d-none');
         }
 
+        function getDetailsFromErrors(errors) {
+            if (!errors || typeof errors !== 'object') {
+                return '';
+            }
+
+            var flattened = [];
+
+            Object.keys(errors).forEach(function (field) {
+                if (!Array.isArray(errors[field])) {
+                    return;
+                }
+
+                errors[field].forEach(function (message) {
+                    if (typeof message === 'string' && message.length > 0) {
+                        flattened.push(message);
+                    }
+                });
+            });
+
+            return flattened.join(' ');
+        }
+
         function submit() {
             resetResultState();
             $submitButton.prop('disabled', true);
@@ -44,7 +66,10 @@
                 }
             }).done(function (response) {
                 if (!response || response.success !== true) {
-                    showError(response && response.message ? response.message : 'Не удалось выполнить запрос.');
+                    var baseMessage = response && response.message ? response.message : 'Не удалось выполнить запрос.';
+                    var details = response ? getDetailsFromErrors(response.errors) : '';
+
+                    showError(details ? baseMessage + ' ' + details : baseMessage);
                     return;
                 }
 

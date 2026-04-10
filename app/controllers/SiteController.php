@@ -78,11 +78,21 @@ class SiteController extends Controller
         try {
             $result = $this->shortLinkService->create($model->url);
         } catch (LinkCreationException $exception) {
-            return $this->errorResponse($exception->getMessage());
+            return $this->errorResponse(
+                $exception->getMessage(),
+                ['url' => [$exception->getMessage()]]
+            );
         } catch (\Throwable $exception) {
             Yii::error($exception, __METHOD__);
 
-            return $this->errorResponse('Не удалось создать короткую ссылку.');
+            $message = 'Не удалось создать короткую ссылку.';
+            $errors = [];
+
+            if (YII_DEBUG) {
+                $errors['system'] = [$exception->getMessage()];
+            }
+
+            return $this->errorResponse($message, $errors);
         }
 
         return [
