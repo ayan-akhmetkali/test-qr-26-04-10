@@ -58,6 +58,7 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 'POST link/create' => 'site/create-link',
+                'stats' => 'site/stats',
                 'r/<code:[A-Za-z0-9_-]{4,16}>' => 'redirect/go',
             ],
         ],

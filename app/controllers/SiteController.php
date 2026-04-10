@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\ClickStatsSearch;
 use app\models\ShortLinkForm;
 use app\services\Exception\LinkCreationException;
 use app\services\ShortLinkService;
@@ -61,6 +62,17 @@ class SiteController extends Controller
     {
         return $this->render('index', [
             'model' => new ShortLinkForm(),
+        ]);
+    }
+
+    public function actionStats(): string
+    {
+        $searchModel = new ClickStatsSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('stats', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
