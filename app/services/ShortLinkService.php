@@ -7,7 +7,8 @@ use app\services\Contracts\ShortCodeGeneratorInterface;
 use app\services\Contracts\UrlAvailabilityCheckerInterface;
 use app\services\Dto\ShortLinkResult;
 use app\services\Exception\LinkCreationException;
-use Da\QrCode\QrCode;
+use dosamigos\qrcode\QrCode;
+use dosamigos\qrcode\lib\Enum;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
@@ -15,6 +16,7 @@ use yii\base\InvalidConfigException;
 class ShortLinkService
 {
     private const MAX_GENERATION_ATTEMPTS = 5;
+    private const QR_SIZE = 260;
 
     public function __construct(
         private ShortCodeGeneratorInterface $shortCodeGenerator,
@@ -78,7 +80,14 @@ class ShortLinkService
 
         $filename = $shortCode . '.png';
         $path = $directory . DIRECTORY_SEPARATOR . $filename;
-        (new QrCode($payload))->writeFile($path);
+
+        QrCode::png(
+            text: $payload,
+            outfile: $path,
+            level: Enum::QR_ECLEVEL_M,
+            size: self::QR_SIZE,
+            margin: 2
+        );
 
         return rtrim($this->qrPublicPrefix, '/') . '/' . $filename;
     }
