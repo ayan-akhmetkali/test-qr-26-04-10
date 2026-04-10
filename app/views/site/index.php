@@ -1,15 +1,14 @@
 <?php
 
 use yii\helpers\Url;
-use yii\web\JsExpression;
 use yii\widgets\ActiveForm;
-use yii\widgets\MaskedInput;
 
 /** @var yii\web\View $this */
 /** @var app\models\ShortLinkForm $model */
 
 $this->title = 'Short Link + QR';
 $createUrl = Url::to(['site/create-link']);
+$this->registerJsFile('@web/js/short-link-form.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 ?>
 <div class="site-index">
     <div class="row justify-content-center mt-5">
@@ -24,90 +23,32 @@ $createUrl = Url::to(['site/create-link']);
                         'action' => $createUrl,
                         'enableClientValidation' => true,
                         'validateOnSubmit' => true,
+                        'options' => [
+                            'data-short-link-form' => '1',
+                        ],
                     ]); ?>
-                        <?= $form->field($model, 'url')->widget(MaskedInput::class, [
-                            'clientOptions' => [
-                                'alias' => 'url',
-                            ],
-                            'options' => [
-                                'placeholder' => 'https://example.com/page',
-                                'autocomplete' => 'off',
-                            ],
+                        <?= $form->field($model, 'url')->textInput([
+                            'placeholder' => 'https://example.com/page',
+                            'autocomplete' => 'off',
                         ]) ?>
 
                         <div class="d-grid d-sm-flex gap-2">
-                            <button type="submit" class="btn btn-primary">OK</button>
-                            <button type="button" id="copy-short-url" class="btn btn-outline-secondary" disabled>Скопировать ссылку</button>
+                            <button type="submit" class="btn btn-primary" data-role="submit">OK</button>
+                            <button type="button" class="btn btn-outline-secondary" data-role="copy" disabled>Скопировать ссылку</button>
                         </div>
                     <?php ActiveForm::end(); ?>
 
-                    <div id="short-link-error" class="alert alert-danger mt-4 d-none"></div>
+                    <div class="alert alert-danger mt-4 d-none" role="alert" data-role="error"></div>
 
-                    <div id="short-link-result" class="mt-4 d-none">
+                    <div class="mt-4 d-none" data-role="result">
                         <h2 class="h5">Результат</h2>
                         <p class="mb-2">
-                            <a href="#" id="short-url-link" target="_blank" rel="noopener noreferrer"></a>
+                            <a href="#" target="_blank" rel="noopener noreferrer" data-role="short-url"></a>
                         </p>
-                        <img id="short-url-qr" src="" alt="QR code" class="img-thumbnail" style="max-width: 220px;">
+                        <img src="" alt="QR code" class="img-thumbnail" style="max-width: 220px;" data-role="qr-image">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<?php
-$js = new JsExpression(<<<JS
-(() => {
-    const form = $('#short-link-form');
-    const errorBox = $('#short-link-error');
-    const resultBox = $('#short-link-result');
-    const shortUrlLink = $('#short-url-link');
-    const shortQr = $('#short-url-qr');
-    const copyButton = $('#copy-short-url');
-
-    form.on('beforeSubmit', function () {
-        errorBox.addClass('d-none').text('');
-
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                url: $('#shortlinkform-url').val(),
-                _csrf: yii.getCsrfToken()
-            }
-        }).done(function (response) {
-            if (!response || response.success !== true) {
-                resultBox.addClass('d-none');
-                copyButton.prop('disabled', true);
-                const message = response && response.message ? response.message : 'Не удалось выполнить запрос.';
-                errorBox.removeClass('d-none').text(message);
-                return;
-            }
-
-            shortUrlLink.attr('href', response.short_url).text(response.short_url);
-            shortQr.attr('src', response.qr_url);
-            copyButton.prop('disabled', false);
-            resultBox.removeClass('d-none');
-        }).fail(function () {
-            resultBox.addClass('d-none');
-            copyButton.prop('disabled', true);
-            errorBox.removeClass('d-none').text('Сервис временно недоступен.');
-        });
-
-        return false;
-    });
-
-    copyButton.on('click', function () {
-        const shortUrl = shortUrlLink.text();
-        if (!shortUrl) {
-            return;
-        }
-
-        navigator.clipboard.writeText(shortUrl);
-    });
-})();
-JS);
-$this->registerJs($js);
-?>
