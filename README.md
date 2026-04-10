@@ -113,7 +113,4 @@ docker compose down -v
 ## Документы
 
 - Архитектурный документ: `docs/test-task-architecture.md`
-- Краткий документ для ревью: `docs/review-brief.md`
 
-Ссылка на документ для проверки: [docs/review-brief.md](docs/review-brief.md)
-Ссылка на расширенный документ: [docs/test-task-architecture.md](docs/test-task-architecture.md)
