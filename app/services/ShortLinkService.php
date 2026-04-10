@@ -7,10 +7,9 @@ use app\services\Contracts\ShortCodeGeneratorInterface;
 use app\services\Contracts\UrlAvailabilityCheckerInterface;
 use app\services\Dto\ShortLinkResult;
 use app\services\Exception\LinkCreationException;
-use Da\QrCode\QrCode;
 use Da\QrCode\Lib\Enum;
+use Da\QrCode\QrCode;
 use Yii;
-use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 
 class ShortLinkService
@@ -29,18 +28,13 @@ class ShortLinkService
 
     public function create(string $originalUrl): ShortLinkResult
     {
-        $url = trim($originalUrl);
-        if ($url === '') {
-            throw new InvalidArgumentException('URL не может быть пустым.');
-        }
-
-        if (!$this->urlAvailabilityChecker->isAvailable($url)) {
+        if (!$this->urlAvailabilityChecker->isAvailable($originalUrl)) {
             throw new LinkCreationException('Данный URL не доступен.');
         }
 
         $link = new Link();
-        $link->original_url = $url;
-        $link->normalized_url = $url;
+        $link->original_url = $originalUrl;
+        $link->normalized_url = $originalUrl;
         $link->short_code = $this->generateUniqueShortCode();
 
         if (!$link->save()) {
